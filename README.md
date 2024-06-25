@@ -64,9 +64,9 @@ go get github.com/cardinalby/hureg
 ```go
 import "github.com/cardinalby/hureg"
 
-chiRouter := chi.NewRouter()                    // --
+httpServeMux := http.NewServeMux()              // with go 1.22
 cfg := huma.DefaultConfig("My API", "1.0.0")    // default HUMA initialization
-humaApi := humachi.New(chiRouter, cfg)          // --
+humaApi := humago.New(httpServeMux, cfg)        // --
 
 api := hureg.NewAPIGen(humaApi)    // The new line
 ```
@@ -106,10 +106,15 @@ hureg.Get(trGr, "/crocodile", ...)
 ### 🔻 Complete server setup
 
 Check out [integration_test.go](./integration_test.go) for a complete example of how to use the library:
-- create `huma.API` from `chi` router
+- create `huma.API` from `http.ServeMux` router
 - create `APIGen` instance on top of `huma.API`
 - register operations with `APIGen` instance
   - use base paths, tags and _Transformers_ to the groups
   - register OpenAPI endpoints manually with Basic Auth middleware
 
 Uncommenting one line you can run the server and play with it in live mode.
+
+## Go version
+
+Even though Huma declares Go 1.20 as the minimal supported version, it actually requires Go 1.22 for correct work
+due to "slices" package usage. So `hureg` requires Go 1.22 explicitly.

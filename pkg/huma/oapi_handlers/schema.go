@@ -28,6 +28,8 @@ func GetSchemaAdapterHandler(humaApi huma.API, schemasPath string) func(ctx huma
 
 // GetSchemaTypedHandler returns a handler that will return a schema from the OpenAPI spec.
 // The handler format is suitable for passing it to huma or hureg registration functions.
+//
+//goland:noinspection GoUnusedExportedFunction
 func GetSchemaTypedHandler(humaApi huma.API, schemasPath string) TypedStreamHandler {
 	adapterHandler := GetSchemaAdapterHandler(humaApi, schemasPath)
 	return getTypedStreamHandler(adapterHandler)

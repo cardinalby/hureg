@@ -51,6 +51,8 @@ func Get[I, O any](
 
 // Post is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Post[I, O any](
 	api API,
 	path string,
@@ -62,6 +64,8 @@ func Post[I, O any](
 
 // Put is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Put[I, O any](
 	api API,
 	path string,
@@ -73,6 +77,8 @@ func Put[I, O any](
 
 // Patch is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Patch[I, O any](
 	api API,
 	path string,
@@ -84,6 +90,8 @@ func Patch[I, O any](
 
 // Delete is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Delete[I, O any](
 	api API,
 	path string,
@@ -96,6 +104,8 @@ func Delete[I, O any](
 
 // Options is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Options[I, O any](
 	api API,
 	path string,
@@ -108,6 +118,8 @@ func Options[I, O any](
 
 // Head is a shortcut for Register method that implicitly generates Operation object
 // metadata.KeyIsExplicitOperationID, metadata.KeyIsExplicitSummary keys will not be set.
+//
+//goland:noinspection GoUnusedExportedFunction
 func Head[I, O any](
 	api API,
 	path string,

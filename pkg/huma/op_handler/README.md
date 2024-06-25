@@ -38,7 +38,6 @@ What can you do with provided _Operation Handlers_ is:
 
 - [Add Security entries to the operation](./add_security.go)
 - [Add Tags to the operation](./add_tags.go)
-- [Add description to the operation](./add_description.go)
 - [Generate operationID](./generate_operation_id.go) - can be useful for explicitly defined operations
 - [Generate operation Summary](./generate_summary.go) - can be useful for explicitly defined operations
 - [Conditionally apply other handlers](./if.go)

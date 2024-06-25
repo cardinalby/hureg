@@ -1,8 +1,9 @@
 package op_handler
 
 import (
+	"slices"
+
 	"github.com/danielgtaylor/huma/v2"
-	"golang.org/x/exp/slices"
 )
 
 // AddTags creates an OperationHandler that appends the given tags to the operation's Tags field.

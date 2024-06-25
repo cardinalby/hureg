@@ -1,8 +1,8 @@
 package operation
 
 import (
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
+	"maps"
+	"slices"
 
 	"github.com/danielgtaylor/huma/v2"
 )

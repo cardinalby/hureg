@@ -11,7 +11,7 @@ import (
 // It provides a fluent API to create derived APIGen instances with own set of actions/changes to an
 // operation before its registration.
 type APIGen struct {
-	humaAPI        huma.API
+	humaAPIWrapper humaApiWrapper
 	regMiddlewares RegMiddlewares
 	transformers   []huma.Transformer
 }
@@ -19,13 +19,13 @@ type APIGen struct {
 // NewAPIGen creates a new APIGen instance with the given huma.API.
 func NewAPIGen(humaApi huma.API) APIGen {
 	return APIGen{
-		humaAPI: newHumaApiWrapper(humaApi),
+		humaAPIWrapper: newHumaApiWrapper(humaApi),
 	}
 }
 
 // GetHumaAPI returns the wrapped huma.API.
 func (a APIGen) GetHumaAPI() huma.API {
-	return a.humaAPI
+	return a.humaAPIWrapper
 }
 
 // AddRegMiddleware returns a new APIGen instance with the given RegMiddlewares added to the stored RegMiddlewares.

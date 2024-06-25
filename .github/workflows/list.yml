@@ -16,7 +16,7 @@ jobs:
           go-version-file: 'go.mod'
 
       - run: go mod download
-      - run: go test ./...
+      - run: go test -vet=all -race ./...
 
       - env:
           GOPROXY: "proxy.golang.org"

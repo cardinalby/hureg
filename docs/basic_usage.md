@@ -13,9 +13,9 @@ registered with the particular instance of `APIGen`.
 ```go
 import "github.com/cardinalby/hureg"
 
-chiRouter := chi.NewRouter()                  // chi router is used in the example for 
-cfg := huma.DefaultConfig("My API", "1.0.0")  // go 1.20 compatibility.
-humaApi := humachi.New(chiRouter, cfg)        // It's default Huma initialization
+httpServeMux := http.NewServeMux()            // with Go 1.22 
+cfg := huma.DefaultConfig("My API", "1.0.0")  // 
+humaApi := humago.New(httpServeMux, cfg)      // It's default Huma initialization
 
 api := hureg.NewAPIGen(humaApi)               // That's how APIGen instance is created
 

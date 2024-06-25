@@ -33,7 +33,7 @@ func TestAPIGen_GetHumaAPI(t *testing.T) {
 	t.Parallel()
 	humaAPI := humago.New(http.NewServeMux(), huma.Config{})
 	api := NewAPIGen(humaAPI)
-	require.Equal(t, humaAPI, api.GetHumaAPI())
+	require.Same(t, humaAPI, api.GetHumaAPI().(humaApiWrapper).API)
 }
 
 func TestAPIGen_GetRegMiddlewares(t *testing.T) {

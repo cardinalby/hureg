@@ -15,8 +15,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/danielgtaylor/huma/v2/adapters/humachi"
-	"github.com/go-chi/chi/v5"
+	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
@@ -30,21 +29,23 @@ func TestHttpServer(t *testing.T) {
 	addr, stop := listenAndServe(t, handler)
 	defer stop()
 
+	_ = addr
 	testServerEndpoints(t, addr)
 	testOpenApiSpec(t, addr)
 
 	// uncomment to play with the server
-	waitSigInt(stop)
+	//waitSigInt(stop)
 }
 
 func createTestServer(t *testing.T) http.Handler {
-	chiRouter := chi.NewRouter()
+	httpServeMux := http.NewServeMux()
 
 	cfg := huma.DefaultConfig("My API", "1.0.0")
 	cfg.OpenAPIPath = ""
 	cfg.DocsPath = ""
+	cfg.SchemasPath = ""
 
-	humaApi := humachi.New(chiRouter, cfg)
+	humaApi := humago.New(httpServeMux, cfg)
 
 	api := NewAPIGen(humaApi)
 
@@ -53,7 +54,7 @@ func createTestServer(t *testing.T) http.Handler {
 	apiWithBasicAuth := api.AddMiddlewares(newTestBasicAuthMiddleware())
 	defineManualOpenApiEndpoints(t, apiWithBasicAuth)
 
-	return chiRouter
+	return httpServeMux
 }
 
 func defineAnimalEndpoints(api APIGen) {
@@ -246,6 +247,7 @@ func getBytesResponse(t *testing.T, addr, path string, headers http.Header) []by
 	return data
 }
 
+//goland:noinspection GoUnusedFunction
 func waitSigInt(stop func()) {
 	onInterrupt := make(chan os.Signal, 1)
 	signal.Notify(onInterrupt, os.Interrupt)
