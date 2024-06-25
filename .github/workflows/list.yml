@@ -1,0 +1,23 @@
+name: list
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+jobs:
+  list:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+
+      - run: go mod download
+      - run: go test ./...
+
+      - env:
+          GOPROXY: "proxy.golang.org"
+        run: go list -m github.com/cardinalby/hureg@${{ github.ref_name }}
