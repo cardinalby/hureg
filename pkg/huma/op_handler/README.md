@@ -1,5 +1,7 @@
 ## Operation Handlers package
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/cardinalby/hureg/pkg/huma/op_handler.svg)](https://pkg.go.dev/github.com/cardinalby/hureg/pkg/huma/op_handler)
+
 ### Introduction
 
 This package provides a set of _Operation Handlers_ that plays well with `hureg` library.

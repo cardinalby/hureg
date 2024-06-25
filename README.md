@@ -1,3 +1,7 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/cardinalby/hureg.svg)](https://pkg.go.dev/github.com/cardinalby/hureg)
+[![list](https://github.com/cardinalby/hureg/actions/workflows/list.yml/badge.svg)](https://github.com/cardinalby/hureg/actions/workflows/list.yml)
+[![list](https://github.com/cardinalby/hureg/actions/workflows/list.yml/badge.svg)](https://github.com/cardinalby/hureg/actions/workflows/list.yml)
+
 ![hureg logo](./docs/hureg.png)
 
 [HUMA](https://github.com/danielgtaylor/huma) is a great Go framework that enables you to 
