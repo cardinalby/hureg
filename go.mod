@@ -3,7 +3,7 @@ module github.com/cardinalby/hureg
 go 1.22
 
 require (
-	github.com/danielgtaylor/huma/v2 v2.18.0
+	github.com/danielgtaylor/huma/v2 v2.25.0
 	github.com/stretchr/testify v1.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )

@@ -1,6 +1,6 @@
 # Operation Handlers
 
-## Recall
+## Operation Handlers in Huma
 
 _Operation Handlers_ are used in Huma to modify an operation before registration.
 

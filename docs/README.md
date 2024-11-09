@@ -16,4 +16,4 @@
 
 - [Extended operation metadata](./metadata.md)
 - [Per-group Transformers](./transformers.md)
-- [OpenAPI endpoints](./openapi_endpoints.md)
+- [OpenAPI endpoints](./openapi_endpoints.md) and multiple scoped specs

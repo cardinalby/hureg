@@ -3,6 +3,7 @@ package hureg
 import (
 	"context"
 	"net/http"
+	"slices"
 
 	"github.com/danielgtaylor/huma/v2"
 
@@ -17,7 +18,9 @@ var testHumaRegisterer func(api huma.API, operation huma.Operation, handler any)
 // before registration in Huma.
 type API interface {
 	GetHumaAPI() huma.API
+	GetExtraHumaAPIs() []huma.API
 	GetRegMiddlewares() RegMiddlewares
+	GetBubblingRegMiddlewares() RegMiddlewares
 	GetTransformers() []huma.Transformer
 }
 
@@ -162,13 +165,25 @@ func registerImpl[I, O any](
 		}
 
 		op_handler.ApplyToOperationPtr(&op, operationHandlers...)
-		if testHumaRegisterer == nil {
-			huma.Register(humaAPI, op, handler)
-		} else {
-			testHumaRegisterer(humaAPI, op, handler)
+
+		humaAPIs := make([]huma.API, 0, len(api.GetExtraHumaAPIs())+1)
+		extraHumaAPIs := api.GetExtraHumaAPIs()
+		for i := len(extraHumaAPIs) - 1; i >= 0; i-- {
+			humaAPIs = append(humaAPIs, extraHumaAPIs[i])
+		}
+		humaAPIs = append(humaAPIs, humaAPI)
+
+		for _, apiItem := range humaAPIs {
+			if testHumaRegisterer == nil {
+				huma.Register(apiItem, op, handler)
+			} else {
+				testHumaRegisterer(apiItem, op, handler)
+			}
 		}
 	}
-	api.GetRegMiddlewares().Handler(humaRegister)(*operation)
+	reversedBubblingMiddlewares := slices.Clone(api.GetBubblingRegMiddlewares())
+	slices.Reverse(reversedBubblingMiddlewares)
+	append(api.GetRegMiddlewares(), reversedBubblingMiddlewares...).Handler(humaRegister)(*operation)
 }
 
 func initOpMetadata[I, O any](humaApi huma.API, op *huma.Operation, isExplicit bool) {

@@ -3,6 +3,7 @@ package hureg
 import (
 	"github.com/danielgtaylor/huma/v2"
 
+	"github.com/cardinalby/hureg/pkg/huma/humaapi"
 	"github.com/cardinalby/hureg/pkg/huma/op_handler"
 )
 
@@ -11,9 +12,11 @@ import (
 // It provides a fluent API to create derived APIGen instances with own set of actions/changes to an
 // operation before its registration.
 type APIGen struct {
-	humaAPIWrapper humaApiWrapper
-	regMiddlewares RegMiddlewares
-	transformers   []huma.Transformer
+	humaAPIWrapper         humaApiWrapper
+	regMiddlewares         RegMiddlewares
+	bubblingRegMiddlewares RegMiddlewares
+	transformers           []huma.Transformer
+	extraHumaAPIs          []huma.API
 }
 
 // NewAPIGen creates a new APIGen instance with the given huma.API.
@@ -37,6 +40,19 @@ func (a APIGen) AddRegMiddleware(regMiddlewares ...RegMiddleware) APIGen {
 // GetRegMiddlewares returns the stored RegMiddlewares.
 func (a APIGen) GetRegMiddlewares() RegMiddlewares {
 	return a.regMiddlewares
+}
+
+// AddBubblingRegMiddleware returns a new APIGen instance with the given RegMiddlewares added to the
+// stored bubbling RegMiddlewares. Bubbling RegMiddlewares will be applied to the operation in the opposite order
+// after normal RegMiddlewares are done allowing you to observe changes made by all previous RegMiddlewares.
+func (a APIGen) AddBubblingRegMiddleware(regMiddlewares ...RegMiddleware) APIGen {
+	a.bubblingRegMiddlewares = append(a.bubblingRegMiddlewares, regMiddlewares...)
+	return a
+}
+
+// GetBubblingRegMiddlewares returns the stored bubbling RegMiddlewares.
+func (a APIGen) GetBubblingRegMiddlewares() RegMiddlewares {
+	return a.bubblingRegMiddlewares
 }
 
 // AddOpHandler returns a new APIGen instance with the given OperationHandlers added to it.
@@ -110,4 +126,27 @@ func (a APIGen) AddMultiBasePaths(
 // AddMiddlewares returns a new APIGen instance that will add the given middlewares to the operation.
 func (a APIGen) AddMiddlewares(middlewares ...func(huma.Context, func(huma.Context))) APIGen {
 	return a.AddOpHandler(op_handler.AddMiddlewares(middlewares...))
+}
+
+// AddExtraHumaAPI returns a new APIGen instance with the given huma.API added to the extraHumaAPIs.
+// All operations registered with this APIGen instance or derived instances will be passed to the given `api`
+// additionally to the main huma.API.
+func (a APIGen) AddExtraHumaAPI(api huma.API) APIGen {
+	a.extraHumaAPIs = append(a.extraHumaAPIs, api)
+	return a
+}
+
+// GetExtraHumaAPIs returns the stored extraHumaAPIs.
+func (a APIGen) GetExtraHumaAPIs() []huma.API {
+	return a.extraHumaAPIs
+}
+
+// AddOwnOpenAPI is a shortcut function to create a new APIGen instance and a OpenAPI object instance together.
+// All operations registered with this APIGen instance or derived instances will be added to the OpenAPI object.
+// It allows you to have separate OpenAPI spec that contains only operations registered with this APIGen instance
+// or derived instances.
+// Use it in combination with `pkg/huma/oapi_handlers` package to serve the created OpenAPI spec.
+func (a APIGen) AddOwnOpenAPI(apiConfig huma.Config) (APIGen, *huma.OpenAPI) {
+	humaApi := humaapi.NewDummyHumaAPI(apiConfig)
+	return a.AddExtraHumaAPI(humaApi), humaApi.OpenAPI()
 }

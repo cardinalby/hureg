@@ -51,5 +51,22 @@ myRegMiddleware := func(op huma.Operation, next func(huma.Operation)) {
 }
 ```
 
+## Advanced: bubbling registration middlewares
+
+If you want to see the changes made by all registration middlewares
+in the chain (in derived `APIGen` instances) before an operation will be actually registered in Huma, here is the way:
+
+```go
+bubblingRegMiddleware := func(op huma.Operation, next func(huma.Operation)) {
+    // do something with the operation
+    next(op)
+}
+api = api.AddBubblingRegMiddleware(bubblingRegMiddleware)
+derived = api.AddOpHandler(op_handlers.AddTags("tag1"))
+```
+
+In this example `bubblingRegMiddleware` will receive an operation registered with `derived` back being able
+to observe added tags.
+
 ---
 [Create a group with base path →](./base_path.md)

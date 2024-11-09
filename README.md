@@ -27,6 +27,7 @@ Similar to other routers you can create a derived `api` (i.e. group) that has pr
 Now you have [manual control](./docs/openapi_endpoints.md) over exposing the spec, docs and schemas:
 - Expose only needed spec versions
 - Add own middlewares (e.g. authentication to protect the spec on public APIs)
+- Have separate scoped OpenAPI specs for different parts of your API
 
 ### ❤️ Access more metadata in Operation Handlers
 
@@ -59,7 +60,7 @@ go get github.com/cardinalby/hureg
 
 - [Operation metadata](./docs/metadata.md)
 - [Per-group Transformers](./docs/transformers.md)
-- [OpenAPI endpoints](./docs/openapi_endpoints.md)
+- [OpenAPI endpoints](./docs/openapi_endpoints.md) and multiple scoped specs
 
 ## Examples
 

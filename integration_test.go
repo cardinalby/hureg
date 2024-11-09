@@ -34,7 +34,7 @@ func TestHttpServer(t *testing.T) {
 	testOpenApiSpec(t, addr)
 
 	// uncomment to play with the server
-	//waitSigInt(stop)
+	// waitSigInt(stop)
 }
 
 func createTestServer(t *testing.T) http.Handler {
@@ -49,15 +49,15 @@ func createTestServer(t *testing.T) http.Handler {
 
 	api := NewAPIGen(humaApi)
 
-	defineAnimalEndpoints(api)
+	defineAnimalEndpoints(t, api)
 
 	apiWithBasicAuth := api.AddMiddlewares(newTestBasicAuthMiddleware())
-	defineManualOpenApiEndpoints(t, apiWithBasicAuth)
+	defineManualOpenApiEndpoints(t, apiWithBasicAuth, humaApi.OpenAPI(), "")
 
 	return httpServeMux
 }
 
-func defineAnimalEndpoints(api APIGen) {
+func defineAnimalEndpoints(t *testing.T, api APIGen) {
 	type testResponseDto struct {
 		Body string
 	}
@@ -67,6 +67,9 @@ func defineAnimalEndpoints(api APIGen) {
 		AddTransformers(duplicateResponseStringTransformer)
 
 	v1gr := beasts.AddBasePath("/v1")
+	// create separate huma.API instance to expose isolated OpenAPI spec only for v1 endpoints
+	v1gr, v1OpenSpec := v1gr.AddOwnOpenAPI(huma.DefaultConfig("v1", "1.0.0"))
+	defineManualOpenApiEndpoints(t, v1gr, v1OpenSpec, "/v1")
 
 	Get(v1gr, "/cat", func(ctx context.Context, _ *struct{}) (*testResponseDto, error) {
 		return &testResponseDto{Body: "Meow"}, nil
@@ -103,17 +106,23 @@ func newTestBasicAuthMiddleware() func(ctx huma.Context, next func(huma.Context)
 	)
 }
 
-func defineManualOpenApiEndpoints(t *testing.T, api APIGen) {
+func defineManualOpenApiEndpoints(
+	t *testing.T,
+	api APIGen,
+	openApi *huma.OpenAPI,
+	prefix string,
+) {
 	api = api.AddOpHandler(op_handler.SetHidden(true, true))
-	humaApi := api.GetHumaAPI()
 
-	yaml31Handler, err := oapi_handlers.GetOpenAPITypedHandler(
-		humaApi, oapi_handlers.OpenAPIVersion3dot1, oapi_handlers.OpenAPIFormatYAML,
+	yaml31Handler, err := oapi_handlers.GetOpenAPISpecHandler(
+		openApi, oapi_handlers.OpenAPIVersion3dot1, oapi_handlers.OpenAPIFormatYAML,
 	)
 	require.NoError(t, err)
 
 	Get(api, "/openapi.yaml", yaml31Handler)
-	Get(api, "/docs", oapi_handlers.GetDocsTypedHandler(humaApi, "/openapi.yaml"))
+	Get(api, "/docs", oapi_handlers.GetDocsHandler(openApi, prefix+"/openapi.yaml"))
+	schemaHandler := oapi_handlers.GetSchemaHandler(openApi, "")
+	Get(api, "/schemas/{schemaPath}", schemaHandler)
 }
 
 func testServerEndpoints(t *testing.T, addr string) {

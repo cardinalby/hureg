@@ -1,6 +1,6 @@
 # OpenAPI endpoints
 
-## Recall
+## OpenAPI endpoints in Huma
 
 Huma generates OpenAPI endpoints by default:
 - **OpenAPI spec** endpoints (if `Config.OpenAPIPath` is set):
@@ -57,17 +57,43 @@ oapiGroup := api.  // api is APIGen instance
 **Step 2**: register OpenAPI endpoints manually using library-provided handlers
 
 ```go
-yaml31Handler, _ := oapi_handlers.GetOpenAPITypedHandler(
-    api.GetHumaAPI(), 
-	oapi_handlers.OpenAPIVersion3dot1, 
-	oapi_handlers.OpenAPIFormatYAML,
+openAPI := api.GetHumaAPI().GetOpenAPI() // OpenAPI object
+
+yaml31Handler, err := oapi_handlers.GetOpenAPISpecHandler(
+    openAPI, oapi_handlers.OpenAPIVersion3dot1, oapi_handlers.OpenAPIFormatYAML,
 )
 
-docsHandler := oapi_handlers.GetDocsTypedHandler(
+docsHandler := oapi_handlers.GetDocsHandler(
 	api.GetHumaAPI(), 
 	"/openapi.yaml",     // path to the OpenAPI spec HTML page will request
 )
 
+schemaHandler := oapi_handlers.GetSchemaHandler(openApi, "")
+
 Get(oapiGroup, "/openapi.yaml", yaml31Handler)
 Get(oapiGroup, "/docs", docsHandler)
+Get(oapiGroup, "/schemas/{schemaPath}", schemaHandler)
 ```
+
+### Advanced: separate spec for some endpoints
+
+Sometimes we need to have a separate spec that contains only a subset of the operations. 
+
+Add scoped `OpenAPI` object to your group:
+
+```go
+api := hureg.NewAPIGen(humaApi)
+experimentalApi, experimentalOpenAPI := api.AddOwnOpenAPI(huma.DefaultConfig("experimental", "1.0.0"))
+stableApi, stableOpenAPI := api.AddOwnOpenAPI(huma.DefaultConfig("stable", "1.0.0"))
+```
+
+`experimentalOpenAPI` and `stableOpenAPI` are `*huma.OpenAPI` objects bind to the corresponding `APIGen` instances.
+
+All registered operations will be added to the main `api` instance and its `OpenAPI` object. 
+
+But `experimentalOpenAPI` and `stableOpenAPI` will contain only operations registered with 
+`experimentalApi` and `stableApi` correspondingly.
+
+You can use the handlers from the previous example to expose them separately.
+
+
