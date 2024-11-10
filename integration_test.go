@@ -29,7 +29,6 @@ func TestHttpServer(t *testing.T) {
 	addr, stop := listenAndServe(t, handler)
 	defer stop()
 
-	_ = addr
 	testServerEndpoints(t, addr)
 	testOpenApiSpec(t, addr)
 
@@ -174,7 +173,7 @@ func getMapsKey(data any, paths ...string) any {
 }
 
 func listenAndServe(t *testing.T, handler http.Handler) (addr string, stop func()) {
-	addr, err := getFreePort(8080)
+	addr, err := getFreePort(8089)
 	require.NoError(t, err)
 
 	server := &http.Server{Addr: addr, Handler: handler}

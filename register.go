@@ -18,7 +18,7 @@ var testHumaRegisterer func(api huma.API, operation huma.Operation, handler any)
 // before registration in Huma.
 type API interface {
 	GetHumaAPI() huma.API
-	GetExtraHumaAPIs() []huma.API
+	GetExtraHumaAPIs() []ExtraHumaApiInstance
 	GetRegMiddlewares() RegMiddlewares
 	GetBubblingRegMiddlewares() RegMiddlewares
 	GetTransformers() []huma.Transformer
@@ -157,33 +157,39 @@ func registerImpl[I, O any](
 	humaAPI := api.GetHumaAPI()
 	initOpMetadata[I, O](humaAPI, operation, isExplicit)
 
-	humaRegister := func(op huma.Operation) {
+	regMiddlewares := api.GetRegMiddlewares()
+	for _, oh := range operationHandlers {
+		regMiddlewares = append(regMiddlewares, NewRegMiddleware(oh))
+	}
+	bubblingRegMiddlewares := api.GetBubblingRegMiddlewares()
+	for i := len(bubblingRegMiddlewares) - 1; i >= 0; i-- {
+		regMiddlewares = append(regMiddlewares, bubblingRegMiddlewares[i])
+	}
+
+	regMiddlewares.Handler(func(op huma.Operation) {
 		// Pass transformers saved in api to the ctx key, that will be later picked up by
 		// humaApiWrapper.Transform method
 		if apiTransformers := api.GetTransformers(); len(apiTransformers) > 0 {
 			op.Middlewares = append(op.Middlewares, middlewares.SetCtxTransformers(apiTransformers))
 		}
 
-		op_handler.ApplyToOperationPtr(&op, operationHandlers...)
-
-		humaAPIs := make([]huma.API, 0, len(api.GetExtraHumaAPIs())+1)
-		extraHumaAPIs := api.GetExtraHumaAPIs()
-		for i := len(extraHumaAPIs) - 1; i >= 0; i-- {
-			humaAPIs = append(humaAPIs, extraHumaAPIs[i])
-		}
-		humaAPIs = append(humaAPIs, humaAPI)
-
-		for _, apiItem := range humaAPIs {
+		registerWithHuma := func(humaApi huma.API, op huma.Operation) {
 			if testHumaRegisterer == nil {
-				huma.Register(apiItem, op, handler)
+				huma.Register(humaApi, op, handler)
 			} else {
-				testHumaRegisterer(apiItem, op, handler)
+				testHumaRegisterer(humaApi, op, handler)
 			}
 		}
-	}
-	reversedBubblingMiddlewares := slices.Clone(api.GetBubblingRegMiddlewares())
-	slices.Reverse(reversedBubblingMiddlewares)
-	append(api.GetRegMiddlewares(), reversedBubblingMiddlewares...).Handler(humaRegister)(*operation)
+		registerWithHuma(humaAPI, op)
+
+		for _, extraHumaAPI := range api.GetExtraHumaAPIs() {
+			extraBubblingRegMiddlewares := slices.Clone(extraHumaAPI.bubblingRegMiddlewares)
+			slices.Reverse(extraBubblingRegMiddlewares)
+			extraBubblingRegMiddlewares.Handler(func(op huma.Operation) {
+				registerWithHuma(extraHumaAPI.humaAPI, op)
+			})(op)
+		}
+	})(*operation)
 }
 
 func initOpMetadata[I, O any](humaApi huma.API, op *huma.Operation, isExplicit bool) {
