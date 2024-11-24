@@ -31,6 +31,14 @@ func NewAPIGen(humaApi huma.API) APIGen {
 	}
 }
 
+// ReplaceHumaAPI returns a new APIGen instance with replaced huma.API pointer.
+// Can be useful for some tricky cases when you create huma.API instance based on another adapter but with
+// the same config (and OpenAPI object pointer) to utilize router-specific middlewares for a group.
+func (a APIGen) ReplaceHumaAPI(humaApi huma.API) APIGen {
+	a.humaAPIWrapper = newHumaApiWrapper(humaApi)
+	return a
+}
+
 // GetHumaAPI returns the wrapped huma.API.
 func (a APIGen) GetHumaAPI() huma.API {
 	return a.humaAPIWrapper

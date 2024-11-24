@@ -16,6 +16,7 @@ Similar to other routers you can create a derived `api` (i.e. group) that has pr
 - [**Base path**](./docs/base_path.md) (same as `Group`, `Route` methods in other routers) 
 - [**Multiple**](./docs/base_path.md) alternative **base paths**
 - [**Middlewares**](./pkg/huma/op_handler/middlewares.go)
+  - including a [trick](./docs/huma_api_per_group.md) to use router-specific middlewares for a group 
 - [**Transformers**](./docs/transformers.md)
 - [**Tags**](./pkg/huma/op_handler/add_tags.go) and [other](./pkg/huma/op_handler) Huma Operation properties 
   that will be applied to all endpoints in a group.

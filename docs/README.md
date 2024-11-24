@@ -17,3 +17,4 @@
 - [Extended operation metadata](./metadata.md)
 - [Per-group Transformers](./transformers.md)
 - [OpenAPI endpoints](./openapi_endpoints.md) and multiple scoped specs
+- [Use a dedicated `huma.API` for a group](./huma_api_per_group.md) to utilize router-specific middlewares for a group

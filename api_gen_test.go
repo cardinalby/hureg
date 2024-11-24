@@ -31,9 +31,21 @@ func testRegMiddleware(
 
 func TestAPIGen_GetHumaAPI(t *testing.T) {
 	t.Parallel()
-	humaAPI := humago.New(http.NewServeMux(), huma.Config{})
-	api := NewAPIGen(humaAPI)
+	cfg := huma.DefaultConfig("test_api", "1.0.1")
+	humaAPI := humago.New(http.NewServeMux(), cfg)
+	api := NewAPIGen(humaAPI).AddRegMiddleware(func(op huma.Operation, next func(huma.Operation)) {
+		next(op)
+	})
 	require.Same(t, humaAPI, api.GetHumaAPI().(humaApiWrapper).API)
+	require.Len(t, api.GetRegMiddlewares(), 1)
+
+	cfg.OpenAPIPath = ""
+	cfg.DocsPath = ""
+	cfg.SchemasPath = ""
+	humaAPI2 := humago.New(http.NewServeMux(), cfg)
+	api2 := api.ReplaceHumaAPI(humaAPI2)
+	require.NotSame(t, api.GetHumaAPI().(humaApiWrapper).API, api2.GetHumaAPI().(humaApiWrapper).API)
+	require.Len(t, api.GetRegMiddlewares(), 1)
 }
 
 func TestAPIGen_GetRegMiddlewares(t *testing.T) {
